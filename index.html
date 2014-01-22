@@ -1,0 +1,66 @@
+<!DOCTYPE>
+<html>
+<head>
+	<title>Basketball Stats w/ Node.js & Socket.io</title>
+
+	<style>
+		.error {
+			color: red;
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+
+	<div>
+		<p class="error"></p>
+		<form id="register_game">
+			<input size="35" id="game_name"></input>
+			<input type="submit"></input>
+		</form>
+	</div>
+
+	<div id="games_list">
+	</div>
+
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+
+		jQuery(function($) {
+
+			var socket = io.connect();
+			var $gameName = $("#game_name");
+			var $gameForm = $("#register_game");
+			var $gamesList = $("#games_list");
+
+			console.log(socket);
+
+			$gameName.focus();
+
+			$gameForm.submit(function(e) {
+				e.preventDefault();
+
+				socket.emit("new game", $gameName.val(), function(gameObj) {
+					if (gameObj) {
+						console.log(gameObj);
+						addGame(gameObj.gameName);
+						$("p.error").html('');
+						
+					} else {
+						$("p.error").html('*Game already in progress.');
+					}
+				});
+				$gameName.val('');
+			});
+
+			function addGame(gameName) {
+				var html = "<div>"+ gameName +"</div>";
+				$gamesList.append(html);
+			};
+
+
+		});
+	</script>
+</body>
+</html>
