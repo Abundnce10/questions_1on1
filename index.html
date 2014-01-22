@@ -14,13 +14,23 @@
 
 	<div>
 		<p class="error"></p>
+		<p><b>Add a new game</b></p>
 		<form id="register_game">
 			<input size="35" id="game_name"></input>
 			<input type="submit"></input>
 		</form>
 	</div>
 
-	<div id="games_list">
+	<br>
+
+	<div>
+		<h3>Games in Progress</h3>
+		<div id="games_in_progress"></div>
+	</div>
+
+	<div>
+		<h3>Completed Games</h3>
+		<div id="games_finished"></div>
 	</div>
 
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
@@ -32,7 +42,7 @@
 			var socket = io.connect();
 			var $gameName = $("#game_name");
 			var $gameForm = $("#register_game");
-			var $gamesList = $("#games_list");
+			var $gamesInProgress = $("#games_in_progress");
 
 			console.log(socket);
 
@@ -41,23 +51,19 @@
 			$gameForm.submit(function(e) {
 				e.preventDefault();
 
-				socket.emit("new game", $gameName.val(), function(gameObj) {
-					if (gameObj) {
-						console.log(gameObj);
-						addGame(gameObj.gameName);
-						$("p.error").html('');
-						
-					} else {
-						$("p.error").html('*Game already in progress.');
-					}
+				socket.emit("new game", $gameName.val(), function() {
+					console.log("Added game")
 				});
 				$gameName.val('');
 			});
 
-			function addGame(gameName) {
-				var html = "<div>"+ gameName +"</div>";
-				$gamesList.append(html);
-			};
+			socket.on("update games", function(games) {
+				html = "";
+				for (var i = 0; i < games.length; i++) {
+					html += "<div>"+ games[i] +"</div>";
+				}
+				$gamesInProgress.html(html);
+			});
 
 
 		});

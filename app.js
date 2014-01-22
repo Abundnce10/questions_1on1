@@ -14,23 +14,16 @@ app.get("/", function(req, res) {
 
 io.sockets.on("connection", function(socket) {
 
-	console.log("connected to client");
+	function updateGames() {
+		io.sockets.emit("update games", games.map( function(g) { return g.gameName } ))
+	};
 
-	socket.on("new game", function(gameName, callback) {
-		
-		console.log(games);
-		console.log(gameName);
+	updateGames();
 
-		if (games.indexOf(gameName) !== -1) {
-			callback(false);
-		} else {
-			
-			console.log(games);
-
-			games.push(gameName);
-			callback({gameId: gameIds, gameName: gameName});
-			gameIds += 1;
-		}
+	socket.on("new game", function(gameName) {
+		games.push({gameId: gameIds, gameName: gameName});
+		gameIds += 1;
+		updateGames();
 	});
 
 
