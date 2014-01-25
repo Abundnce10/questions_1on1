@@ -26,9 +26,12 @@
 
 	<br>
 
-	<div class="container text-center" id="game_container">
-		<h2 id="game_message"></h2>
+	<h2 id="game_message"></h2>
 
+	<div class="container text-center" id="game_container">
+		
+
+<!--
 		<div class="container">
 			<div class="row" id="names">
 				<h4 class="col-xs-3 col-xs-offset-2 text-right" id="you">You</h4>
@@ -40,6 +43,34 @@
 				<h4 class="col-xs-3 col-xs-offset-2 text-left" id="opponent"></h4>
 			</div>
 		</div>
+-->
+
+		<div class="container">
+			<div class="row text-center">
+				<div class="col-xs-4 col-xs-offset-1">
+					<div class="row">
+						<h3 id="youName">Lefty</h3>
+					</div>
+					<div class="row">
+						<h4 id="youScore">0</h4>
+					</div>
+				</div>
+				<div class="col-xs-2">
+					<div class="row">
+						<h3 id="smileySuccess">Smiley Face</h2>
+					</div>
+				</div>
+				<div class="col-xs-4">
+					<div class="row">
+						<h3 id="oppName">Righty</h3>
+					</div>
+					<div class="row">
+						<h4 id="oppScore">0</h4>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<div class="container" id="question_container">
 			<h6 id="right_wrong" class="green"></h6>
@@ -113,7 +144,6 @@
 				});
 				$name.val('');
 				$formContainer.hide();
-				$gameContainer.show()
 			});
 
 			$(".answer").on("click", function(e) {
@@ -122,7 +152,7 @@
 				var answer = $(this).text();
 				var questionId = $questionId.text();
 				var gameKey = $gameKey.text();
-				var userName = $("#names #you").text();
+				var userName = $("#youName").text();
 
 				console.log(answer);
 				console.log(questionId);
@@ -137,8 +167,9 @@
 
 			socket.on("start game", function(ownName, oppName) {
 				$gameMessage.hide();
-				$("#names #you").html(ownName);
-				$("#names #opponent").html(oppName);
+				$gameContainer.show();
+				$("#youName").html(ownName);
+				$("#oppName").html(oppName);
 
 			});
 
@@ -183,8 +214,10 @@
 				console.log(question);
 				
 				// update score
-				$("#scores #you").html(yourScore);
-				$("#scores #opponent").html(oppScore);
+				//$("#scores #you").html(yourScore);
+				//$("#scores #opponent").html(oppScore);
+				$("#youScore").html(yourScore);
+				$("#oppScore").html(oppScore);
 
 			})
 
