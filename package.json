@@ -2,8 +2,14 @@
 	"name": "node_basketball",
 	"version": "0.0.1",
 	"private": "true",
+	"script": {
+		"start": "nodemon app.js"
+	},
 	"dependencies": {
 		"socket.io": "0.9.16",
 		"express": "3.4.8"
+	},
+	"devDependencies": {
+		"nodemon": "*"	
 	}
 }

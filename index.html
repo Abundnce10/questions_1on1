@@ -1,7 +1,8 @@
 <!DOCTYPE>
 <html>
 <head>
-	<title>Basketball Stats w/ Node.js & Socket.io</title>
+	<title>Quick Questions - 1 vs. 1</title>
+	<link rel="stylesheet" type="text/css" href="./twitter_bootstrap_3.min.css"></link>
 
 	<style>
 		.error {
@@ -12,26 +13,60 @@
 </head>
 <body>
 
-	<div>
-		<p class="error"></p>
-		<p><b>Add a new game</b></p>
-		<form id="register_game">
-			<input size="35" id="game_name"></input>
-			<input type="submit"></input>
-		</form>
+	<div class="container text-center">
+		<div id="form_container">
+			<p class="error"></p>
+			<p><b>Enter your name</b></p>
+			<form id="register_name">
+				<input size="35" id="name"></input>
+				<input type="submit"></input>
+			</form>
+		</div>
 	</div>
 
 	<br>
 
-	<div>
-		<h3>Games in Progress</h3>
-		<div id="games_in_progress"></div>
+	<div class="container text-center" id="game_container">
+		<h2 id="game_message"></h2>
+
+		<div class="container">
+			<div class="row" id="names">
+				<h4 class="col-xs-3 col-xs-offset-2 text-right" id="you">You</h4>
+				
+				<h4 class="col-xs-3 col-xs-offset-2 text-left" id="opponent"></h4>
+			</div>
+			<div class="row" id="scores">
+				<h4 class="col-xs-3 col-xs-offset-2 text-right" id="you"></h4>
+				<h4 class="col-xs-3 col-xs-offset-2 text-left" id="opponent"></h4>
+			</div>
+		</div>
+
+		<div class="container" id="question_container">
+			<h6 id="right_wrong" class="green"></h6>
+			<div id="question_wrapper">
+				<h4 id="question"></h4>
+				<p id="question_id" style="display:none;"></p>
+				<p id="game_key" style="display:none"></p>
+				<p id="user_name" style="display:none"></p>
+				<a href="#"><div class="answer btn btn-lg btn-primary" id="answer1"></div></a>
+				<a href="#"><div class="answer btn btn-lg btn-primary" id="answer2"></div></a>
+				<a href="#"><div class="answer btn btn-lg btn-primary" id="answer3"></div></a>
+				<a href="#"><div class="answer btn btn-lg btn-primary" id="answer4"></div></a>
+			</div>
+			<div id="question_review" class="text-center container">
+				<h4 id="question"></h4>
+				<p>Answer:</p>
+				<div class="row">
+					<h2 id="answer" class="col-xs-6 col-xs-offset-3"></h2>
+					
+				</div>
+			</div>
+		</div>
 	</div>
 
-	<div>
-		<h3>Completed Games</h3>
-		<div id="games_finished"></div>
-	</div>
+
+
+	
 
 	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
@@ -40,30 +75,129 @@
 		jQuery(function($) {
 
 			var socket = io.connect();
-			var $gameName = $("#game_name");
-			var $gameForm = $("#register_game");
-			var $gamesInProgress = $("#games_in_progress");
+			var $formContainer = $("#form_container");
+			var $name = $("#name");
+			var $nameForm = $("#register_name");
+			var $gameContainer = $("#game_container");
+			var $gameMessage = $("#game_message");
+			var $questionContainer = $("#question_container");
+			var $question = $("#question_wrapper #question");
+			var $questionId = $("#question_id");
+			var $gameKey = $("#game_key");
+			var $userName = $("#user_name");
+			var $questionWrapper = $("#question_wrapper");
+			var $rightWrong = $("#right_wrong");
+			var $answer1 = $("#answer1");
+			var $answer2 = $("#answer2");
+			var $answer3 = $("#answer3");
+			var $answer4 = $("#answer4");
+			var $questionReviewContainer = $("#question_review");
+			var $questionSummary = $("#question_review #question");
+			var $answerSummary = $("#question_review #answer");
+			var $shoutout = $("#shoutout");
 
-			console.log(socket);
 
-			$gameName.focus();
+			$questionReviewContainer.hide();
+			$gameContainer.hide();
+			$questionContainer.hide();
+			$rightWrong.hide();
 
-			$gameForm.submit(function(e) {
+			$name.focus();
+
+
+			$nameForm.submit(function(e) {
 				e.preventDefault();
 
-				socket.emit("new game", $gameName.val(), function() {
-					console.log("Added game")
+				socket.emit("new player", $name.val(), function() {
+					console.log("Player added")
 				});
-				$gameName.val('');
+				$name.val('');
+				$formContainer.hide();
+				$gameContainer.show()
 			});
 
-			socket.on("update games", function(games) {
-				html = "";
-				for (var i = 0; i < games.length; i++) {
-					html += "<div>"+ games[i] +"</div>";
-				}
-				$gamesInProgress.html(html);
+			$(".answer").on("click", function(e) {
+				e.preventDefault();
+
+				var answer = $(this).text();
+				var questionId = $questionId.text();
+				var gameKey = $gameKey.text();
+				var userName = $("#names #you").text();
+
+				console.log(answer);
+				console.log(questionId);
+
+				socket.emit("answer", gameKey, questionId, answer, userName);
 			});
+
+
+			socket.on("waiting for opponent", function() {
+				$gameMessage.html("Waiting for an opponent to join...");
+			});
+
+			socket.on("start game", function(ownName, oppName) {
+				$gameMessage.hide();
+				$("#names #you").html(ownName);
+				$("#names #opponent").html(oppName);
+
+			});
+
+			socket.on("new question", function(gameKey, q) {
+				$questionContainer.show();
+				$questionWrapper.show();
+
+				$rightWrong.hide();
+				$questionReviewContainer.hide();
+
+				$question.html(q.question);
+				$questionId.html(q.questionId);
+				$gameKey.html(gameKey);
+				// place options
+				$answer1.html(q.options[0]);
+				$answer2.html(q.options[1]);
+				$answer3.html(q.options[2]);
+				$answer4.html(q.options[3]);
+			});
+
+
+			socket.on("correct", function() {
+				showQuestionResult("Correct");
+			});
+			socket.on("wrong", function () {
+				showQuestionResult("Wrong")
+			});
+
+
+			socket.on("question result", function(winner, question, yourScore, oppScore) {
+				$rightWrong.html(winner + " was the winner.");
+				$rightWrong.show();
+				$questionWrapper.hide();
+
+				// show the answer to the question
+				$questionReviewContainer.show();
+				$questionSummary.html(question.question);
+				$answerSummary.html(question.answer.toString())
+
+				console.log(yourScore);
+				console.log(oppScore);
+				console.log(question);
+				
+				// update score
+				$("#scores #you").html(yourScore);
+				$("#scores #opponent").html(oppScore);
+
+			})
+
+
+
+
+			function showQuestionResult(result) {
+				$questionWrapper.hide();
+				$rightWrong.html(result);
+				$rightWrong.show();
+			}
+
+
 
 
 		});

@@ -1,1 +1,1 @@
-# Basketball Games using Node.js & Socket.io
+# Head-to-Head Questions using Node.js & Socket.io
