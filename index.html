@@ -29,25 +29,10 @@
 	<h2 id="game_message"></h2>
 
 	<div class="container text-center" id="game_container">
-		
-
-<!--
-		<div class="container">
-			<div class="row" id="names">
-				<h4 class="col-xs-3 col-xs-offset-2 text-right" id="you">You</h4>
-				
-				<h4 class="col-xs-3 col-xs-offset-2 text-left" id="opponent"></h4>
-			</div>
-			<div class="row" id="scores">
-				<h4 class="col-xs-3 col-xs-offset-2 text-right" id="you"></h4>
-				<h4 class="col-xs-3 col-xs-offset-2 text-left" id="opponent"></h4>
-			</div>
-		</div>
--->
 
 		<div class="container">
-			<div class="row text-center">
-				<div class="col-xs-4 col-xs-offset-1">
+			<div class="row text-center" id="score_wrapper">
+				<div class="col-xs-4 col-xs-offset-1" id="you">
 					<div class="row">
 						<h3 id="youName">Lefty</h3>
 					</div>
@@ -56,11 +41,12 @@
 					</div>
 				</div>
 				<div class="col-xs-2">
-					<div class="row">
-						<h3 id="smileySuccess">Smiley Face</h2>
+					<div class="row" id="smileyFaces">
+						<h3 id="correct" style="color:green;">Correct</h3>
+						<h3 id="wrong" style="color:red;">Wrong</h3>
 					</div>
 				</div>
-				<div class="col-xs-4">
+				<div class="col-xs-4" id="opp">
 					<div class="row">
 						<h3 id="oppName">Righty</h3>
 					</div>
@@ -126,12 +112,18 @@
 			var $questionSummary = $("#question_review #question");
 			var $answerSummary = $("#question_review #answer");
 			var $shoutout = $("#shoutout");
+			var $correct = $("#smileyFaces #correct");
+			var $wrong = $("#smileyFaces #wrong");
+			var $youWrapper = $("#score_wrapper #you");
+			var $oppWrapper = $("#score_wrapper #opp");
 
 
 			$questionReviewContainer.hide();
 			$gameContainer.hide();
 			$questionContainer.hide();
 			$rightWrong.hide();
+			$correct.hide();
+			$wrong.hide();
 
 			$name.focus();
 
@@ -150,14 +142,13 @@
 				e.preventDefault();
 
 				var answer = $(this).text();
-				var questionId = $questionId.text();
 				var gameKey = $gameKey.text();
 				var userName = $("#youName").text();
 
 				console.log(answer);
-				console.log(questionId);
+				
 
-				socket.emit("answer", gameKey, questionId, answer, userName);
+				socket.emit("answer", gameKey, answer, userName);
 			});
 
 
@@ -179,9 +170,11 @@
 
 				$rightWrong.hide();
 				$questionReviewContainer.hide();
+				$correct.hide();
+				$wrong.hide();
 
 				$question.html(q.question);
-				$questionId.html(q.questionId);
+				//$questionId.html(q.questionId);
 				$gameKey.html(gameKey);
 				// place options
 				$answer1.html(q.options[0]);
@@ -199,7 +192,7 @@
 			});
 
 
-			socket.on("question result", function(winner, question, yourScore, oppScore) {
+			socket.on("question result", function(youSuccess, oppSuccess, winner, question, yourScore, oppScore) {
 				$rightWrong.html(winner + " was the winner.");
 				$rightWrong.show();
 				$questionWrapper.hide();
@@ -214,10 +207,19 @@
 				console.log(question);
 				
 				// update score
-				//$("#scores #you").html(yourScore);
-				//$("#scores #opponent").html(oppScore);
 				$("#youScore").html(yourScore);
 				$("#oppScore").html(oppScore);
+
+				// show smiley face
+				if (youSuccess) {
+					$correct.show();
+					//$youWrapper.css('background-color', 'green');
+					//$oppWrapper.css('background-color', 'red');
+				} else {
+					$wrong.show();
+					//$oppWrapper.css('background-color', 'green');
+					//$youWrapper.css('background-color', 'red');
+				}
 
 			})
 

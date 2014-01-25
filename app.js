@@ -2,6 +2,7 @@ var express = require("express"),
 	app = express(),
 	server = require("http").createServer(app),
 	io = require("socket.io").listen(server),
+	fs = require("fs"),
 	names = [],
 	games = {},
 	gameCounter = 0;
@@ -27,6 +28,7 @@ var questions = [
 		options: ["Blue", "Orange", "Yellow", "Pink"]
 	}
 ];
+
 
 
 server.listen(3000);
@@ -95,13 +97,12 @@ io.sockets.on("connection", function(socket) {
 
 	}
 
-	socket.on("answer", function(gameKey, questionId, answer, userName) {
+	socket.on("answer", function(gameKey, answer, userName) {
 
 		var game = games[gameKey];
 		var question = games[gameKey].currentQuestion;
 
 		console.log(gameKey);
-		console.log(questionId);
 		console.log(answer);
 		console.log(userName);
 		console.log("found question")
@@ -118,8 +119,8 @@ io.sockets.on("connection", function(socket) {
 
 				game.opponent1Score = (parseInt(game.opponent1Score) + 1).toString();
 				//io.sockets.in(gameKey).emit("question result", userName, questions[i], game.opponent1Score, game.opponent2Score);
-				game.opponent1.socket.emit("question result", userName, question, game.opponent1Score, game.opponent2Score);
-				game.opponent2.socket.emit("question result", userName, question, game.opponent2Score, game.opponent1Score);
+				game.opponent1.socket.emit("question result", true, false, userName, question, game.opponent1Score, game.opponent2Score);
+				game.opponent2.socket.emit("question result", false, true, userName, question, game.opponent2Score, game.opponent1Score);
 				games[gameKey] = game;
 
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
@@ -134,8 +135,8 @@ io.sockets.on("connection", function(socket) {
 				console.log("opponent2")
 
 				game.opponent2Score = (parseInt(game.opponent2Score) + 1).toString();
-				game.opponent2.socket.emit("question result", game.opponent2.name, question, game.opponent2Score, game.opponent1Score);
-				game.opponent1.socket.emit("question result", game.opponent2.name, question, game.opponent1Score, game.opponent2Score);
+				game.opponent2.socket.emit("question result", true, false, game.opponent2.name, question, game.opponent2Score, game.opponent1Score);
+				game.opponent1.socket.emit("question result", false, true, game.opponent2.name, question, game.opponent1Score, game.opponent2Score);
 				games[gameKey] = game;
 
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
