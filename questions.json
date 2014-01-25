@@ -1,0 +1,20 @@
+[
+	{
+		"questionId":1,
+		"question":"How many fingers do humans have?",
+		"answer":5,
+		"options":[3,4,5,6]
+	},
+	{
+		"questionId":2,
+		"question":"How many days in a week?",
+		"answer":7,
+		"options":[2,5,7,9]
+	},
+	{
+		"questionId":3,
+		"question":"What color is produced from red and green?",
+		"answer":"Blue",
+		"options":["Blue","Orange","Yellow","Pink"]
+	}
+]

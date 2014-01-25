@@ -3,39 +3,19 @@ var express = require("express"),
 	server = require("http").createServer(app),
 	io = require("socket.io").listen(server),
 	fs = require("fs"),
+	questions = require("./questions.json"),
 	names = [],
 	games = {},
 	gameCounter = 0;
 
-
-var questions = [
-	{
-		questionId: 1,
-		question: "How many fingers do humans have?",
-		answer: 5,
-		options: [3,4,5,6]
-	},
-	{
-		questionId: 2,
-		question: "How many days in a week?",
-		answer: 7,
-		options: [2, 5, 7, 9]
-	},
-	{
-		questionId: 3,
-		question: "What color is produced from red and green?",
-		answer: "Blue",
-		options: ["Blue", "Orange", "Yellow", "Pink"]
-	}
-];
-
-
+console.log(questions);
 
 server.listen(3000);
 
 app.get("/", function(req, res) {
 	res.sendfile(__dirname + "/index.html");
 });
+
 
 io.sockets.on("connection", function(socket) {
 
