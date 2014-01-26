@@ -177,12 +177,28 @@
 			});
 
 			socket.on("start game", function(ownName, oppName) {
-				$gameMessage.hide();
+				
 				$gameContainer.show();
+				$gameMessage.show();
 				$("#youName").html(ownName);
 				$("#oppName").html(oppName);
 
+				// display countdown timer
+				var counter = 3;
+				var t;
+				var isTimerOn = false;
+
+				function countdown() {
+					$gameMessage.html("Game will start in: "+ counter.toString() +" seconds");
+					counter --;
+					if (counter > 0) {
+						t = setTimeout(countdown, 1000);
+					}
+				}
+
+				countdown();				
 			});
+
 
 			socket.on("new question", function(gameKey, q) {
 				$questionContainer.show();
@@ -192,6 +208,7 @@
 				$questionReviewContainer.hide();
 				$correct.hide();
 				$wrong.hide();
+				$gameMessage.hide();
 
 				$question.html(q.question);
 				//$questionId.html(q.questionId);
@@ -213,35 +230,27 @@
 
 
 			socket.on("question result", function(youSuccess, oppSuccess, winner, question, yourScore, oppScore) {
-				//$rightWrong.html(winner + " was the winner.");
-				//$rightWrong.show();
-				$questionWrapper.hide();
-
-				// show the answer to the question
-				$questionReviewContainer.show();
-				$questionSummary.html(question.question);
-				$answerSummary.html(question.answer.toString())
-
-				console.log(yourScore);
-				console.log(oppScore);
-				console.log(question);
-				
 				// update score
 				$("#youScore").html(yourScore);
 				$("#oppScore").html(oppScore);
 
-				// show smiley face
-				if (youSuccess) {
+				resultToHtml(youSuccess, question);
+			});
+
+
+			function resultToHtml(success, question) {
+				$questionWrapper.hide();
+				// show the answer to the question
+				$questionReviewContainer.show();
+				$questionSummary.html(question.question);
+				$answerSummary.html(question.answer.toString())
+				
+				if (success) {
 					$correct.show();
-					//$youWrapper.css('background-color', 'green');
-					//$oppWrapper.css('background-color', 'red');
 				} else {
 					$wrong.show();
-					//$oppWrapper.css('background-color', 'green');
-					//$youWrapper.css('background-color', 'red');
 				}
-
-			})
+			};
 
 
 			socket.on("usage stats", function(numPlayers, numGames) {
@@ -257,14 +266,37 @@
 				$gameOver.show();
 			});
 
+			socket.on("both wrong answer", function(gameKey, question) {
+				console.log("both wrong");
+
+				resultToHtml(false, question);
+			});
+
+
+			socket.on("prepare for next question", function(seconds) {
+
+				// display countdown timer
+				var seconds = parseInt(seconds);
+				var t;
+
+				function countdown() {
+					$gameMessage.html("Next Question in: "+ seconds.toString() +" seconds");
+					seconds --;
+					if (seconds > 0) {
+						t = setTimeout(countdown, 1000);
+					}
+				}
+
+				$gameMessage.show();
+				countdown();
+			});
+
 
 			function showQuestionResult(result) {
 				$questionWrapper.hide();
 				$rightWrong.html(result);
 				$rightWrong.show();
 			}
-
-
 
 
 		});

@@ -9,7 +9,9 @@ var express = require("express"),
 	players = 0,
 	gameCounter = 0;
 
-console.log(questions);
+
+var questionCountdown = 3;
+
 
 server.listen(3000);
 
@@ -19,6 +21,10 @@ app.get("/", function(req, res) {
 
 
 io.sockets.on("connection", function(socket) {
+
+	if (players > 0) {
+		io.sockets.emit("usage stats", players, gameCounter);
+	}
 
 
 	socket.on("new player", function(name) {
@@ -35,7 +41,9 @@ io.sockets.on("connection", function(socket) {
 				opponent2: {name: name, socket: socket},
 				opponent1Score: '0',
 				opponent2Score: '0',
-				questions: questions
+				questions: questions,
+				currentQuestion: '',
+				currentWrongs: 0
 			};
 
 			startGame(gameObj);
@@ -73,7 +81,7 @@ io.sockets.on("connection", function(socket) {
 
 		setTimeout(function() {
 			io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-		}, 2000);
+		}, questionCountdown * 1000);
 
 		
 
@@ -117,16 +125,17 @@ io.sockets.on("connection", function(socket) {
 					console.log("Winner: " + winner);
 					setTimeout(function() {	
 						io.sockets.in(gameKey).emit("end game", winner);
-					}, 2000);
+					}, questionCountdown * 1000);
 					return;
 
 				}
 
-
+				io.sockets.in(gameKey).emit("prepare for next question", questionCountdown);
 				setTimeout(function() {
-					console.log("sending new question")
+					console.log("sending new question");
+					games[gameKey].currentWrongs = 0;
 					io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-				}, 2500);
+				}, questionCountdown * 1000);
 
 			} else {
 
@@ -149,29 +158,63 @@ io.sockets.on("connection", function(socket) {
 					console.log("Winner: " + winner);
 					setTimeout(function() {	
 						io.sockets.in(gameKey).emit("end game", winner);
-					}, 2000);
+					}, questionCountdown * 1000);
 					return;
 					
 				}
 
+				io.sockets.in(gameKey).emit("prepare for next question", questionCountdown);
 				setTimeout(function() {
 					console.log("sending new question")
+					games[gameKey].currentWrongs = 0;
 					io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-				}, 2500);
+				}, questionCountdown * 1000);
 
 			}
 		// wrong answer
-		} else {	
-			socket.emit("wrong");
+		} else {
+
+			console.log('wrong');
+			console.log(games[gameKey].currentWrongs);
+			
+			games[gameKey].currentWrongs += 1;
+
+			// both wrong answers?
+			if (games[gameKey].currentWrongs == 2) {
+				io.sockets.in(gameKey).emit("both wrong answers", gameKey, question);
+
+				// wait seconds, send a new question
+				games[gameKey].currentQuestion = games[gameKey].questions.shift();
+				if (games[gameKey].currentQuestion == undefined) {
+
+					var winner = '';
+					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
+						winner = game.opponent1.name;
+					} else {
+						winner = game.opponent2.name;
+					}
+					console.log("Winner: " + winner);
+					setTimeout(function() {	
+						io.sockets.in(gameKey).emit("end game", winner);
+					}, questionCountdown * 1000);
+					return;
+
+				}
+
+				io.sockets.in(gameKey).emit("prepare for next question", questionCountdown);
+				setTimeout(function() {
+					console.log("sending new question");
+					games[gameKey].currentWrongs = 0;
+					io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
+				}, questionCountdown * 1000);
+
+			// one wrong answer
+			} else {
+				socket.emit("wrong");
+			}
 		}
 	
-	
-
 	});
-
-
-
-
 });
 
 
