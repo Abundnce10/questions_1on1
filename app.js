@@ -19,7 +19,7 @@ app.get("/", function(req, res) {
 
 
 io.sockets.on("connection", function(socket) {
-	
+
 
 	socket.on("new player", function(name) {
 
@@ -73,7 +73,7 @@ io.sockets.on("connection", function(socket) {
 
 		setTimeout(function() {
 			io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-		}, 3000);
+		}, 2000);
 
 		
 
@@ -106,11 +106,27 @@ io.sockets.on("connection", function(socket) {
 				games[gameKey] = game;
 
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
+				if (games[gameKey].currentQuestion == undefined) {
+
+					var winner = '';
+					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
+						winner = game.opponent1.name;
+					} else {
+						winner = game.opponent2.name;
+					}
+					console.log("Winner: " + winner);
+					setTimeout(function() {	
+						io.sockets.in(gameKey).emit("end game", winner);
+					}, 2000);
+					return;
+
+				}
+
 
 				setTimeout(function() {
 					console.log("sending new question")
 					io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-				}, 4500);
+				}, 2500);
 
 			} else {
 
@@ -122,11 +138,26 @@ io.sockets.on("connection", function(socket) {
 				games[gameKey] = game;
 
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
+				if (games[gameKey].currentQuestion == undefined) {
+					
+					var winner = '';
+					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
+						winner = game.opponent1.name;
+					} else {
+						winner = game.opponent2.name;
+					}
+					console.log("Winner: " + winner);
+					setTimeout(function() {	
+						io.sockets.in(gameKey).emit("end game", winner);
+					}, 2000);
+					return;
+					
+				}
 
 				setTimeout(function() {
 					console.log("sending new question")
 					io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
-				}, 4500);
+				}, 2500);
 
 			}
 		// wrong answer

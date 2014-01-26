@@ -88,6 +88,12 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="container" id="game_over">
+			<h2>The game is over</h2>
+			<h4>The winner is: <span id="game_winner"></span></h4>
+		</div>
+
 	</div>
 
 
@@ -127,6 +133,8 @@
 			var $oppWrapper = $("#score_wrapper #opp");
 			var $numPlayers = $("#usage_stats #num_players");
 			var $numGames = $("#usage_stats #num_games");
+			var $gameOver = $("#game_over");
+			var $gameWinner = $("#game_winner");
 
 
 			$questionReviewContainer.hide();
@@ -135,6 +143,7 @@
 			$rightWrong.hide();
 			$correct.hide();
 			$wrong.hide();
+			$gameOver.hide();
 
 			$name.focus();
 
@@ -204,8 +213,8 @@
 
 
 			socket.on("question result", function(youSuccess, oppSuccess, winner, question, yourScore, oppScore) {
-				$rightWrong.html(winner + " was the winner.");
-				$rightWrong.show();
+				//$rightWrong.html(winner + " was the winner.");
+				//$rightWrong.show();
 				$questionWrapper.hide();
 
 				// show the answer to the question
@@ -238,6 +247,14 @@
 			socket.on("usage stats", function(numPlayers, numGames) {
 				$numPlayers.html(numPlayers);
 				$numGames.html(numGames);
+			});
+
+			socket.on("end game", function(winner) {
+				console.log(winner);
+				
+				$questionReviewContainer.hide();
+				$gameWinner.html(winner);
+				$gameOver.show();
 			});
 
 
