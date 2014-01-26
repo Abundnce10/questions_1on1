@@ -36,12 +36,21 @@ io.sockets.on("connection", function(socket) {
 			var opp = names.pop();
 			console.log(name + ' vs. ' + opp.name)
 
+			function clone(obj) {
+			    if (null == obj || "object" != typeof obj) return obj;
+			    var copy = obj.constructor();
+			    for (var attr in obj) {
+			        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+			    }
+			    return copy;
+			}
+
 			var gameObj = {
 				opponent1: opp,
 				opponent2: {name: name, socket: socket},
 				opponent1Score: '0',
 				opponent2Score: '0',
-				questions: questions,
+				questions: clone(questions),
 				currentQuestion: '',
 				currentWrongs: 0
 			};
@@ -119,8 +128,10 @@ io.sockets.on("connection", function(socket) {
 					var winner = '';
 					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
 						winner = game.opponent1.name;
-					} else {
+					} else if (parseInt(game.opponent1Score) > parseInt(game.opponent1Score)) {
 						winner = game.opponent2.name;
+					} else {
+						winner = "Tie";
 					}
 					console.log("Winner: " + winner);
 					setTimeout(function() {	
@@ -152,8 +163,10 @@ io.sockets.on("connection", function(socket) {
 					var winner = '';
 					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
 						winner = game.opponent1.name;
-					} else {
+					} else if (parseInt(game.opponent1Score) > parseInt(game.opponent1Score)) {
 						winner = game.opponent2.name;
+					} else {
+						winner = "Tie";
 					}
 					console.log("Winner: " + winner);
 					setTimeout(function() {	
@@ -190,8 +203,10 @@ io.sockets.on("connection", function(socket) {
 					var winner = '';
 					if (parseInt(game.opponent1Score) > parseInt(game.opponent2Score)) {
 						winner = game.opponent1.name;
-					} else {
+					} else if (parseInt(game.opponent1Score) > parseInt(game.opponent1Score)) {
 						winner = game.opponent2.name;
+					} else {
+						winner = "Tie";
 					}
 					console.log("Winner: " + winner);
 					setTimeout(function() {	
