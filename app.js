@@ -122,6 +122,9 @@ io.sockets.on("connection", function(socket) {
 				game.opponent2.socket.emit("question result", false, true, userName, question, game.opponent2Score, game.opponent1Score);
 				games[gameKey] = game;
 
+				console.log("opponent1Score: " + game.opponent1Score.toString());
+				console.log("opponent2Score: " + game.opponent2Score.toString());
+
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
 				if (games[gameKey].currentQuestion == undefined) {
 
@@ -156,6 +159,9 @@ io.sockets.on("connection", function(socket) {
 				game.opponent2.socket.emit("question result", true, false, game.opponent2.name, question, game.opponent2Score, game.opponent1Score);
 				game.opponent1.socket.emit("question result", false, true, game.opponent2.name, question, game.opponent1Score, game.opponent2Score);
 				games[gameKey] = game;
+
+				console.log("opponent1Score: " + game.opponent1Score.toString());
+				console.log("opponent2Score: " + game.opponent2Score.toString());
 
 				games[gameKey].currentQuestion = games[gameKey].questions.shift();
 				if (games[gameKey].currentQuestion == undefined) {
