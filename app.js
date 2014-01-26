@@ -6,7 +6,7 @@ var express = require("express"),
 	questions = require("./questions.json"),
 	names = [],
 	games = {},
-	players = 1,
+	players = 0,
 	gameCounter = 0;
 
 
@@ -231,13 +231,13 @@ io.sockets.on("connection", function(socket) {
 	
 	});
 
-/*
+
 	socket.on("disconnect", function() {
 		players -= 1;
 		console.log("player left");
 		io.sockets.emit("usage stats", players, gameCounter);
 	})
-*/
+
 
 });
 

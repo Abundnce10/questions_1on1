@@ -106,7 +106,9 @@
 
 		jQuery(function($) {
 
-			var socket = io.connect();
+			var socket = io.connect(window.location.origin, {
+				'sync disconnect on unload': true
+			});
 			var $formContainer = $("#form_container");
 			var $name = $("#name");
 			var $nameForm = $("#register_name");
