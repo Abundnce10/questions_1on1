@@ -6,6 +6,7 @@ var express = require("express"),
 	questions = require("./questions.json"),
 	names = [],
 	games = {},
+	players = 0,
 	gameCounter = 0;
 
 console.log(questions);
@@ -18,11 +19,12 @@ app.get("/", function(req, res) {
 
 
 io.sockets.on("connection", function(socket) {
-
-	socket.emit("usage stats", { names: names.length, games: games.length } );
-
+	
 
 	socket.on("new player", function(name) {
+
+		players += 1;
+		io.sockets.emit("usage stats", players, gameCounter);
 
 		if (names.length > 0) {
 			var opp = names.pop();
@@ -67,7 +69,7 @@ io.sockets.on("connection", function(socket) {
 		one.socket.emit("start game", one.name, two.name);
 		two.socket.emit("start game", two.name, one.name);
 
-
+		io.sockets.emit("usage stats", players, gameCounter);
 
 		setTimeout(function() {
 			io.sockets.in(gameKey).emit('new question', gameKey, games[gameKey].currentQuestion);
@@ -142,7 +144,10 @@ io.sockets.on("connection", function(socket) {
 });
 
 
-
+io.sockets.on("disconnect", function() {
+	players -= 1;
+	io.sockets.emit("usage stats", players, gameCounter);
+})
 
 
 

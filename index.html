@@ -13,6 +13,17 @@
 </head>
 <body>
 
+	<div class="container row" id="usage_stats">
+		<div class="col-xs-6 text-right">
+			<p>Active Players: <span id="num_players">0</span></p>
+		</div>
+		<div class="col-xs-6 text-left">
+			<p>Active Games: <span id="num_games">0</span></p>
+		</div>
+	</div>
+
+	<h4 class="text-center" id="game_message"></h4>
+
 	<div class="container text-center">
 		<div id="form_container">
 			<p class="error"></p>
@@ -25,8 +36,6 @@
 	</div>
 
 	<br>
-
-	<h2 id="game_message"></h2>
 
 	<div class="container text-center" id="game_container">
 
@@ -116,6 +125,8 @@
 			var $wrong = $("#smileyFaces #wrong");
 			var $youWrapper = $("#score_wrapper #you");
 			var $oppWrapper = $("#score_wrapper #opp");
+			var $numPlayers = $("#usage_stats #num_players");
+			var $numGames = $("#usage_stats #num_games");
 
 
 			$questionReviewContainer.hide();
@@ -224,6 +235,10 @@
 			})
 
 
+			socket.on("usage stats", function(numPlayers, numGames) {
+				$numPlayers.html(numPlayers);
+				$numGames.html(numGames);
+			});
 
 
 			function showQuestionResult(result) {
