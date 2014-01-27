@@ -14,7 +14,7 @@
 </head>
 <body>
 
-	<div class="container row" id="usage_stats">
+	<div class="container row text-center" id="usage_stats">
 		<div class="col-xs-6 text-right">
 			<p>Active Players: <span id="num_players">0</span></p>
 		</div>
@@ -224,11 +224,8 @@
 			});
 
 
-			socket.on("correct", function() {
-				showQuestionResult("Correct");
-			});
 			socket.on("wrong", function () {
-				showQuestionResult("Wrong")
+				showQuestionResult("Wrong. Waiting for opponent to respond...")
 			});
 
 
