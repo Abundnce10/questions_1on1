@@ -1,6 +1,7 @@
 {
 	"name": "node_basketball",
 	"version": "0.0.1",
+	"description": "1-on-1 Rapid Questions with Node.js & Socket.io",
 	"private": "true",
 	"script": {
 		"start": "nodemon app.js"
@@ -11,5 +12,10 @@
 	},
 	"devDependencies": {
 		"nodemon": "*"	
-	}
+	},
+  	"engines": {
+    	"node": "0.10.x"
+  	},
+  	"author": "Abundnce10",
+  	"license": "MIT"
 }
