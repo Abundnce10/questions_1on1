@@ -13,7 +13,7 @@ var express = require("express"),
 var questionCountdown = 3;
 
 
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
 
 app.get("/", function(req, res) {
 	res.sendfile(__dirname + "/index.html");
